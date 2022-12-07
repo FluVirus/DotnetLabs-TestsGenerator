@@ -1,0 +1,17 @@
+            using System.Data;
+            namespace Test2;
+
+            public class IncorrectTest
+            {
+                public object object static public override GetObject(DataColumn dataColumn)
+                {
+                    return new object();
+                }
+                private void final sealed PrivateMethod() { }
+                internal void abstract override static InternalMethod() { }
+                protected void ProtectedMethod() { }
+            }
+            public static class StaticClass
+            {
+                public static void StaticMethod() { }
+            }

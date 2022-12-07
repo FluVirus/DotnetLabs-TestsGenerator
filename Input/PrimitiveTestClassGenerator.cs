@@ -69,8 +69,8 @@ public class PrimitiveTestClassGenerator : ITestClassGenerator
         }
         else   
         {
-            fileScopedNamespaceDeclaration = FileScopedNamespaceDeclaration(ParseName(classSelector.FileScopesNamespaceDeclaration.Name.ToString() + ".Tests"));
-            testClassName = fileScopedNamespaceDeclaration.Name.ToString().Replace('.', '_');
+            fileScopedNamespaceDeclaration = classSelector.FileScopesNamespaceDeclaration;
+            testClassName = fileScopedNamespaceDeclaration.Name.ToString().Replace('.', '_') + "_Tests";
         }
 
         return CompilationUnit()

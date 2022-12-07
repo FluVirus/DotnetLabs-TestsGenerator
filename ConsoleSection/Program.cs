@@ -1,6 +1,8 @@
 ﻿using University.DotnetLabs.Lab4.TestClassGeneratorLibrary.Interfaces;
 using University.DotnetLabs.Lab4.TestClassGeneratorLibrary.Services;
+using University.DotnetLabs.Lab4.TestClassGeneratorLibrary.Configs;
 using System.Text;
+using University.DotnetLabs.Lab4.TestClassGeneratorLibrary.Pipeline;
 
 namespace University.DotnetLabs.Lab4.ConsoleSection;
 
@@ -10,15 +12,18 @@ public class Program
     static string outputDirectory = "C:\\Users\\User\\source\\repos\\University\\DotnetLabs\\Lab4\\Output";
     static void Main(string[] args)
     {
-        ITestClassGenerator generator = new PrimitiveTestClassGenerator();
+        ITestClassGenerator generator = new SophisticatedTestClassGenerator();
+        PipelineConfigs configs = new PipelineConfigs(3, 3, 3);
+        TestPipeline pipeline = new TestPipeline(generator, configs);
+
+        ICollection<Task> observableTasks = new List<Task>();
         string[] files = Directory.GetFiles(inputDirectory);
         foreach (string file in files) 
-        { 
-            string source = File.ReadAllText(file);
-            string testsource = generator.GenerateTestClassCode(source);
-            string testfile = file + ".TESTS.cs";
-            File.WriteAllText(testfile, testsource, Encoding.Unicode);
+        {
+            Task task = pipeline.Generate(file, outputDirectory);
+            observableTasks.Add(task);
         }
+        Task.WaitAll(observableTasks.ToArray());
         Console.WriteLine("Everything is done");
     }
 }

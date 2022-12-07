@@ -1,0 +1,26 @@
+            using System;
+            using System.Collections.Generic;
+            using System.Data;
+            using System.Linq;
+            using System.Text;
+            using System.Threading.Tasks;
+
+            namespace TestClasses;
+
+                public class Test1
+                {
+                    public int P { get; set; }
+                    public Test1(int p)
+                    {
+                        P = p;
+                    }
+                    public int GetValue(object obj) { return P; }
+                    public void Start(int a) { }
+                    public int Start(int a, double b) 
+                    { 
+                        return 0; 
+                    }
+                    public bool Stop(int a) { return false; }
+
+                }
+           
