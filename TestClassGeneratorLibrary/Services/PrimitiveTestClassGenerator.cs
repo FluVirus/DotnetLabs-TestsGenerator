@@ -60,7 +60,18 @@ public class PrimitiveTestClassGenerator : ITestClassGenerator
         ISet<UsingDirectiveSyntax> allUsings = classSelector.Usings.Union(additionalUnsings).ToHashSet();
         allUsings.Add(UsingDirective(ParseName("Microsoft.VisualStudio.TestTools.UnitTesting")));
 
-        string fileScopeNamespace = (classSelector.FileScopesNamespaceDeclaration is null) ? "Tests" : $"{classSelector.FileScopesNamespaceDeclaration}.Tests";
+        FileScopedNamespaceDeclarationSyntax fileScopedNamespaceDeclaration;
+        string testClassName;
+        if (classSelector.FileScopesNamespaceDeclaration is null)
+        {
+            fileScopedNamespaceDeclaration = FileScopedNamespaceDeclaration(ParseName("Tests"));
+            testClassName = "Tests";
+        }
+        else   
+        {
+            fileScopedNamespaceDeclaration = classSelector.FileScopesNamespaceDeclaration;
+            testClassName = fileScopedNamespaceDeclaration.Name.ToString().Replace('.', '_') + "_Tests";
+        }
 
         return CompilationUnit()
        .WithUsings(
@@ -68,10 +79,9 @@ public class PrimitiveTestClassGenerator : ITestClassGenerator
        .WithMembers(
             new SyntaxList<MemberDeclarationSyntax>()
             .Add(
-                FileScopedNamespaceDeclaration(
-                    ParseName(fileScopeNamespace)))
+                fileScopedNamespaceDeclaration)
             .Add(
-                ClassDeclaration(fileScopeNamespace.Replace('.', '_'))
+                ClassDeclaration(testClassName)
                 .WithAttributeLists(
                     SingletonList(
                         AttributeList(
@@ -82,7 +92,7 @@ public class PrimitiveTestClassGenerator : ITestClassGenerator
                     TokenList(
                         Token(SyntaxKind.PublicKeyword)))
                 .WithMembers(
-                    new SyntaxList<MemberDeclarationSyntax>(testMethods.Append(testCleanup).Append(testInitialize)))))
+                    new SyntaxList<MemberDeclarationSyntax>(testMethods.Prepend(testCleanup).Prepend(testInitialize)))))
        .NormalizeWhitespace()
        .ToFullString();
     }
@@ -101,9 +111,9 @@ public class PrimitiveTestClassGenerator : ITestClassGenerator
             string previousMethodName = string.Empty;
             foreach (MethodDeclarationSyntax publicMethod in classPublicMethods)
             {
-                string currentMethodName = @class.ClassDeclarationSyntax.Identifier.Text;
+                string currentMethodName = publicMethod.Identifier.Text;
                 string currentTestMethodName = 
-                    $"{currentMethodName}_{publicMethod.Identifier.Text}_Test";
+                    $"{@class.ClassDeclarationSyntax.Identifier.Text}_{publicMethod.Identifier.Text}_Test";
                 if (currentMethodName == previousMethodName)
                 {
                     currentTestMethodName = $"{currentTestMethodName}_{++methodIndex}";

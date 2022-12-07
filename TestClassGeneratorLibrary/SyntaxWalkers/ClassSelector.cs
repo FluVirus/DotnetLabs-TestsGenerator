@@ -7,6 +7,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using University.DotnetLabs.Lab4.TestClassGeneratorLibrary.Records;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace University.DotnetLabs.Lab4.TestClassGeneratorLibrary.SyntaxWalkers;
 internal class ClassSelector : CSharpSyntaxWalker
@@ -46,8 +47,8 @@ internal class ClassSelector : CSharpSyntaxWalker
     }
 
     public override void VisitFileScopedNamespaceDeclaration(FileScopedNamespaceDeclarationSyntax node)
-    { 
-        FileScopesNamespaceDeclaration = node;
+    {
+        FileScopesNamespaceDeclaration = node.RemoveNodes(node.Members, SyntaxRemoveOptions.KeepNoTrivia);//FileScopedNamespaceDeclaration(ParseName(node.Name.ToString()));
         base.VisitFileScopedNamespaceDeclaration(node);
     }
 
